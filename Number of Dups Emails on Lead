@@ -1,0 +1,28 @@
+trigger LeadTrigger on Lead (before insert, before update) {
+
+
+        Set<Id> LeadIds = new Set<Id>();
+
+         for (Lead Lead : Trigger.new) {
+
+                LeadIds.add(Lead.id);
+
+         }
+
+            List<AggregateResult> notuniquemails = ([SELECT email FROM lead WHERE id IN:LeadIds 
+                                                        AND email <> null GROUP BY email]);
+
+
+            if(notuniquemails.Size()>0 ){
+
+
+                for (AggregateResult notuniquemail : notuniquemails){
+
+                    lead.NumberofDuplications__c = Integer.valueOf(String.valueOf(notuniquemails.get('NumberofDuplications__c')));
+                    system.debug('======>'+String.valueOf(notuniquemails.get('email')));
+
+                }               
+            }
+
+} 
+// line 21 error -> Method does not exist or incorrect signature: [List<AggregateResult>].get(String)
